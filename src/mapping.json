@@ -1,0 +1,134 @@
+{
+  "corn": [
+    {
+      "german": "KÖRNERMAIS",
+      "english": "Grain corn"
+    },
+    {
+      "german": "SILOMAIS",
+      "english": "Silage corn"
+    },
+    {
+      "german": "MAIS CORN-COB-MIX (CCM)",
+      "english": "Corn-cob-mix"
+    },
+    {
+      "german": "ZUCKERMAIS",
+      "english": "Sweet corn"
+    }
+  ],
+  "spring_barley": [
+    {
+      "german": "SOMMERGERSTE",
+      "english": "Spring barley"
+    }
+  ],
+  "meadow": [
+    {
+      "german": "MÄHWIESE/-WEIDE ZWEI NUTZUNGEN",
+      "english": "Mown meadow or pasture with two uses"
+    },
+    {
+      "german": "MÄHWIESE/-WEIDE DREI UND MEHR NUTZUNGEN",
+      "english": "Mown meadow or pasture with three or more uses"
+    },
+    {
+      "german": "WECHSELWIESE (EGART, ACKERWEIDE)",
+      "english": "Rotational meadow or field pasture"
+    },
+    {
+      "german": "DAUERWEIDE",
+      "english": "Permanent meadow or pasture"
+    },
+    {
+      "german": "EINMÄHDIGE WIESE",
+      "english": "Meadow mown once per season"
+    },
+    {
+      "german": "HUTWEIDE",
+      "english": "Grazed meadow or pasture"
+    },
+    {
+      "german": "ALMFUTTERFLÄCHE",
+      "english": "Alpine meadow for forage"
+    }
+  ],
+  "winter_wheat": [
+    {
+      "german": "WINTERWEICHWEIZEN",
+      "english": "Winter soft wheat"
+    },
+    {
+      "german": "WINTERHARTWEIZEN (DURUM)",
+      "english": "Winter durum wheat"
+    }
+  ],
+  "winter_rapeseed": [
+    {
+      "german": "WINTERRAPS",
+      "english": "Winter rapeseed"
+    }
+  ],
+  "unknown": [
+    {
+      "german": "SONSTIGE ACKERFLÄCHEN",
+      "english": "Other arable land"
+    },
+    {
+      "german": "SONSTIGE ACKERKULTUREN",
+      "english": "Other field crops"
+    }
+  ],
+  "winter_barley": [
+    {
+      "german": "WINTERGERSTE",
+      "english": "Winter barley"
+    }
+  ],
+  "winter_rye": [
+    {
+      "german": "WINTERROGGEN",
+      "english": "Winter rye"
+    }
+  ],
+  "spring_peas": [
+    {
+      "german": "KÖRNERERBSEN",
+      "english": "Grain peas (spring-sown)"
+    }
+  ],
+  "spring_oat": [
+    {
+      "german": "SOMMERHAFER",
+      "english": "Spring oat"
+    }
+  ],
+  "horsebeans": [
+    {
+      "german": "ACKERBOHNEN (PUFFBOHNEN)",
+      "english": "Horse beans (field beans)"
+    }
+  ],
+  "winter_triticale": [
+    {
+      "german": "WINTERTRITICALE",
+      "english": "Winter triticale"
+    }
+  ],
+  "spring_wheat": [
+    {
+      "german": "SOMMERWEICHWEIZEN",
+      "english": "Spring soft wheat"
+    },
+    {
+      "german": "SOMMERHARTWEIZEN (DURUM)",
+      "english": "Spring durum wheat"
+    }
+  ],
+  "spring_triticale": [
+    {
+      "german": "SOMMERTRITICALE",
+      "english": "Spring triticale"
+    }
+  ]
+}

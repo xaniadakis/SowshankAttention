@@ -12,7 +12,7 @@ from scipy.interpolate import CubicSpline
 from sklearn.cluster import KMeans
 
 class ParcelDataset(Dataset):
-    def __init__(self, labels_json_path, zarr_dir, norm_stats_path, train=True, sample_pixels=32, top_k=52):
+    def __init__(self, labels_json_path, zarr_dir, norm_stats_path, train=True, sample_pixels=32, top_k=None):
         with open(labels_json_path, "r") as f:
             self.label_dict = json.load(f)
 
@@ -122,11 +122,18 @@ class ParcelDataset(Dataset):
         #     indices = np.random.choice(n_pixels, size=self.sample_pixels, replace=n_pixels < self.sample_pixels)
         #     data = data[indices]
 
-        # keep only top-K least cloudy time steps
-        if self.top_k < 52:
-            sorted_indices = np.argsort(self.cloudy_pct)[:self.top_k]  # (32,)
-            data = data[:, sorted_indices, :]  # (N, top_k, 10)
-            doy = [self.day_of_year[i] for i in sorted_indices]  # (top_k,)
+
+        if self.top_k is not None:  # If top_k is specified, filter time steps
+            topk_cloudy_indices = np.argsort(self.cloudy_pct)[:self.top_k]  # Get indices of top_k least cloudy time steps
+            topk_ordered = sorted(topk_cloudy_indices, key=lambda i: self.day_of_year[i])  # Sort these indices by date (day of year)
+
+            print(f"data shape: {data.shape}")
+            print(f"cloudy_pct length: {len(self.cloudy_pct)}")
+            print(f"topk indices: {topk_cloudy_indices}")
+            print(f"max index in topk_ordered: {max(topk_ordered)}")
+
+            data = data[:, topk_ordered, :]  # Keep only the selected time steps in data (N pixels, top_k times, 10 bands)
+            doy = [self.day_of_year[i] for i in topk_ordered]  # Extract the day of year values for the selected time steps
 
         # random pixel sampling
         if self.train:
@@ -148,7 +155,7 @@ class ParcelDataset(Dataset):
             data = self._augment(data)
         data = (data - self.mean) / self.std
 
-        doy_tensor = torch.tensor(doy, dtype=torch.long) if self.top_k < 52 else torch.tensor(self.day_of_year, dtype=torch.long)
+        doy_tensor = torch.tensor(doy, dtype=torch.long) if self.top_k is not None else torch.tensor(self.day_of_year, dtype=torch.long)
         return (
             torch.tensor(data, dtype=torch.float32),  # (sample_pixels, top_k, 12)
             torch.tensor(label, dtype=torch.long),
@@ -206,7 +213,7 @@ class ParcelDataset(Dataset):
 
 
 if __name__ == '__main__':
-    top_k = 52
+    top_k = None
     dataset = ParcelDataset(
         labels_json_path="data/denmark/32VNH/2017/meta/filtered_labels.json",
         zarr_dir="data/denmark/32VNH/2017/data",
