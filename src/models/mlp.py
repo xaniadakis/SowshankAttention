@@ -8,7 +8,7 @@ class ClassifierHead(nn.Module):
             nn.Linear(input_dim, hidden_dim),
             nn.BatchNorm1d(hidden_dim),
             nn.ReLU(),
-            nn.Dropout(dropout),  # Increased dropout to 0.3
+            nn.Dropout(dropout),
             nn.Linear(hidden_dim, num_classes)
         )
 

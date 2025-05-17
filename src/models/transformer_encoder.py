@@ -8,13 +8,17 @@ class SinusoidalPositionalEncoding(nn.Module):
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
         div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
-        pe[:, 0::2] = torch.sin(position * div_term)  # even dims
-        pe[:, 1::2] = torch.cos(position * div_term)  # odd dims
+        # even dims
+        pe[:, 0::2] = torch.sin(position * div_term)
+        # odd dims
+        pe[:, 1::2] = torch.cos(position * div_term)
         self.register_buffer('pe', pe)
 
-    def forward(self, day_indices):  # day_indices: (B, T)
-        # Output shape: (B, T, d_model)
-        return self.pe[day_indices]  # indexing on dim 0 (days)
+    # day_indices: (B, T)
+    def forward(self, day_indices):
+        # output shape: (B, T, d_model)
+        # indexing on dim 0 (days)
+        return self.pe[day_indices]
 
 class TransformerTimeEncoder(nn.Module):
     def __init__(self, input_dim=128, num_heads=4, num_layers=2, ff_dim=256, dropout=0.1):
@@ -23,13 +27,12 @@ class TransformerTimeEncoder(nn.Module):
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
         self.cls_token = nn.Parameter(torch.randn(1, 1, input_dim))
         self.pos_encoder = SinusoidalPositionalEncoding(d_model=input_dim)
-        self.dropout = nn.Dropout(dropout)  # Added dropout after transformer
-        self.bn = nn.BatchNorm1d(input_dim)  # Existing batch normalization
+        self.dropout = nn.Dropout(dropout)
+        self.bn = nn.BatchNorm1d(input_dim)
 
     def forward(self, x, day_of_year):
         # x: (B, T, F)
         # day_of_year: (B, T) ints (values 1–366)
-
         B, T, F = x.shape
 
         # positional encoding from actual dates
@@ -42,6 +45,6 @@ class TransformerTimeEncoder(nn.Module):
 
         x = self.encoder(x)  # (B, T+1, F)
         x = x[:, 0]  # return only CLS token output → (B, F)
-        x = self.dropout(x)  # Apply dropout
-        x = self.bn(x)  # Apply batch normalization
+        x = self.dropout(x)
+        x = self.bn(x)
         return x

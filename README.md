@@ -78,7 +78,7 @@ The training pipeline preprocesses data, normalizes it and trains the model.
 -  **Normalization**
 
      ```bash
-     python src/normalization.py
+     python src/normalization.py --mode train
      ```
 
 -  **Training**:
@@ -96,7 +96,7 @@ The inference pipeline prepares test labels, normalizes the data and performs in
 
 -  **Normalization** to normalize the test data, consistent with the training pipeline.
      ```bash
-     python src/normalization.py
+     python src/normalization.py --mode test
      ```
 
 -  **Inference** to generate predictions on the test data.

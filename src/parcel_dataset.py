@@ -2,7 +2,6 @@ import os
 import json
 import pickle
 from datetime import datetime
-
 import zarr
 import numpy as np
 import torch
@@ -37,6 +36,7 @@ class ParcelDataset(Dataset):
         self.dates = meta["dates"]
         self.cloudy_pct = np.array(meta["cloudy_pct"])
         self.day_of_year = self._convert_to_day_of_year(self.dates)
+
         # dynamic threshold based on 75th percentile
         # self.cloud_threshold = np.percentile(self.cloudy_pct, 75)
         # print(f"Dynamic cloud threshold set to: {self.cloud_threshold:.2f}%")
@@ -122,33 +122,37 @@ class ParcelDataset(Dataset):
         #     indices = np.random.choice(n_pixels, size=self.sample_pixels, replace=n_pixels < self.sample_pixels)
         #     data = data[indices]
 
-
-        if self.top_k is not None:  # If top_k is specified, filter time steps
-            topk_cloudy_indices = np.argsort(self.cloudy_pct)[:self.top_k]  # Get indices of top_k least cloudy time steps
-            topk_ordered = sorted(topk_cloudy_indices, key=lambda i: self.day_of_year[i])  # Sort these indices by date (day of year)
+        # if top_k is specified, filter time steps
+        if self.top_k is not None:
+            # get indices of top_k least cloudy time steps
+            topk_cloudy_indices = np.argsort(self.cloudy_pct)[:self.top_k]
+            # sort these indices by date (day of year)
+            topk_ordered = sorted(topk_cloudy_indices, key=lambda i: self.day_of_year[i])
 
             print(f"data shape: {data.shape}")
             print(f"cloudy_pct length: {len(self.cloudy_pct)}")
             print(f"topk indices: {topk_cloudy_indices}")
             print(f"max index in topk_ordered: {max(topk_ordered)}")
 
-            data = data[:, topk_ordered, :]  # Keep only the selected time steps in data (N pixels, top_k times, 10 bands)
-            doy = [self.day_of_year[i] for i in topk_ordered]  # Extract the day of year values for the selected time steps
+            # keep only the selected time steps in data (N pixels, top_k times, 10 bands)
+            data = data[:, topk_ordered, :]
+            # extract the day of year values for the selected time steps
+            doy = [self.day_of_year[i] for i in topk_ordered]
 
         # random pixel sampling
         if self.train:
             n_pixels = data.shape[0]
             indices = np.random.choice(n_pixels, size=self.sample_pixels, replace=n_pixels < self.sample_pixels)
             data = data[indices]
-        # else: keep full set
 
         # compute NDVI and EVI
         nir = data[:, :, 6]  # B8 (NIR)
         red = data[:, :, 2]  # B4 (Red)
         blue = data[:, :, 0]  # B2 (Blue)
-        ndvi = (nir - red) / (nir + red + 1e-10)  # Avoid division by zero
+        # avoid division by zero
+        ndvi = (nir - red) / (nir + red + 1e-10)
         evi = 2.5 * (nir - red) / (nir + 6 * red - 7.5 * blue + 1 + 1e-10)
-        data = np.concatenate([data, ndvi[:, :, np.newaxis], evi[:, :, np.newaxis]], axis=2)  # Shape: (N, 52, 12)
+        data = np.concatenate([data, ndvi[:, :, np.newaxis], evi[:, :, np.newaxis]], axis=2)  # (N, 52, 12)
 
         # augment & normalize
         if self.train:

@@ -73,7 +73,7 @@ if args.mode == 'kfold':
         train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, drop_last=True)
         val_loader = DataLoader(val_set, batch_size=batch_size, drop_last=False)
 
-        # Initialize model
+        # initialize our model
         encoder = PixelSetEncoder(in_channels=12, hidden_dim=64, out_dim=128)
         transformer = TransformerTimeEncoder(input_dim=128)
         classifier = ClassifierHead(input_dim=128, num_classes=8)
@@ -81,7 +81,7 @@ if args.mode == 'kfold':
 
         optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
 
-        # Load class counts from filtered_labels.json
+        # load class counts from filtered_labels.json
         label_counts = np.bincount([int(v) for v in labels_dict.values()])
         class_weights = 1.0 / torch.tensor(label_counts, dtype=torch.float)
         class_weights = class_weights / class_weights.sum() * len(label_counts)
@@ -95,6 +95,7 @@ if args.mode == 'kfold':
         train_losses, val_f1s, y_true, y_pred = [], [], [], []
 
         for epoch in range(epochs):
+            # training phase
             model.train()
             train_loss = 0
             for x, y, doy in train_loader:
@@ -107,7 +108,7 @@ if args.mode == 'kfold':
                 train_loss += loss.item()
             train_losses.append(train_loss / len(train_loader))
 
-            # Validation
+            # validation phase
             model.eval()
             metrics.reset()
             with torch.no_grad():
@@ -125,7 +126,7 @@ if args.mode == 'kfold':
             scheduler.step(val_f1)
             print(f"Epoch {epoch+1}/{epochs} | Loss: {train_loss:.4f} | Val F1_micro: {val_f1:.4f}")
 
-            # Early stopping + checkpointing
+            # early stopping w/ some checkpointing
             if val_f1 > best_val_f1:
                 best_val_f1 = val_f1
                 bad_epochs = 0
@@ -137,7 +138,7 @@ if args.mode == 'kfold':
                     print(f"⏹️ Early stopping triggered at epoch {epoch+1}")
                     break
 
-        # Final evaluation with best model
+        # final evaluation with best model
         model.load_state_dict(torch.load(ckpt_path))
         model.eval()
         metrics.reset()
@@ -155,7 +156,7 @@ if args.mode == 'kfold':
             if k != "confusion_matrix":
                 print(f"{k}: {v:.4f}")
 
-        # Visualization
+        # visualization
         plt.figure(figsize=(10, 5))
         plt.subplot(1, 2, 1)
         plt.plot(train_losses, label="Training Loss")
@@ -178,7 +179,7 @@ if args.mode == 'kfold':
         plt.savefig(os.path.join(model_out_dir, f"confusion_matrix_fold{fold+1}.png"))
         plt.close()
 
-    # Mean + Std reporting for K-fold
+    # mean/std reporting for K-fold run
     print("\n📊 Cross-Validation Summary:")
     keys = ["accuracy", "f1_micro", "f1_weighted", "precision", "recall"]
     for key in keys:
@@ -194,7 +195,7 @@ else:
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, drop_last=True)
     val_loader = DataLoader(val_set, batch_size=batch_size, drop_last=False)
 
-    # init model
+    # init our model
     encoder = PixelSetEncoder(in_channels=12, hidden_dim=64, out_dim=128)
     transformer = TransformerTimeEncoder(input_dim=128)
     classifier = ClassifierHead(input_dim=128, num_classes=8)
@@ -217,6 +218,7 @@ else:
 
     epoch_bar = trange(epochs, desc="Epochs", colour="red")
     for epoch in epoch_bar:
+        # training phase
         model.train()
         metrics.reset()
         train_loss = 0
@@ -237,7 +239,7 @@ else:
         train_f1 = train_result["f1_weighted"]
         train_acc = train_result["accuracy"]
 
-        # evaluation
+        # evaluation phase
         model.eval()
         metrics.reset()
         val_loss = 0
@@ -271,7 +273,7 @@ else:
             f"{color('acc', color='blue')} {val_acc:.2%}"
         )
 
-        # early stopping + checkpointing
+        # early stopping w/ some of checkpointing
         if val_f1 > best_val_f1:
             best_val_f1 = val_f1
             bad_epochs = 0
@@ -300,7 +302,6 @@ else:
         if k != "confusion_matrix":
             print(f"{k}: {v:.4f}")
 
-    # Visualization
     plt.figure(figsize=(10, 5))
     plt.subplot(1, 2, 1)
     plt.plot(train_losses, label="Training Loss")

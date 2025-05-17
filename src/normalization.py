@@ -11,7 +11,6 @@ parser.add_argument("--mode", type=str, default="train", choices=["train", "test
 args = parser.parse_args()
 mode = args.mode
 
-# Configuration
 if mode == "train":
     region = "denmark"
     tile = "32VNH"
@@ -23,7 +22,6 @@ elif mode == "test":
     year = "2017"
     expected_timesteps = 58
 
-# Paths
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 data_dir = os.path.join(base_dir, "data", region, tile, year, "data")
 meta_dir = os.path.join(base_dir, "data", region, tile, year, "meta")
@@ -31,16 +29,15 @@ labels_path = os.path.join(meta_dir, "filtered_labels.json")
 meta_path = os.path.join(meta_dir, "metadata.pkl")
 norm_stats_path = os.path.join(meta_dir, "normalization_stats.json")
 
-# Load labels
 with open(labels_path, "r") as f:
     labels = json.load(f)
 label_keys = list(labels.keys())
 
-# # Subsample if test mode
+# Subsample to run faster
 # if mode == "test":
 #     label_keys = label_keys[::100]
 
-# Load metadata for cloud filtering
+# load metadata for cloud filtering
 with open(meta_path, "rb") as f:
     meta = pickle.load(f)
 cloudy_pct = np.array(meta["cloudy_pct"])
@@ -49,7 +46,6 @@ cloud_threshold = np.percentile(cloudy_pct, 75)
 print(f"[{mode.upper()}] Cloud threshold: {cloud_threshold:.2f}%")
 print(f"[{mode.upper()}] Valid time steps: {(cloudy_pct <= cloud_threshold).sum()} / {len(cloudy_pct)}")
 
-# Init stats
 channel_mean = np.zeros(12)
 channel_M2 = np.zeros(12)
 count = 0
