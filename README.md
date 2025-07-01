@@ -1,5 +1,7 @@
 # SowshankAttention Project
 
+Every pixel deserves a second chance.
+
 ## Overview
 SowshankAttention is a geospatial machine learning project designed to process and analyze Sentinel-2 imagery for agricultural parcel classification. The project leverages attention-based models to capture temporal and spectral dynamics in multispectral data. It includes two primary pipelines: one for **training** a model on labeled parcel data and another for **inference** on test data. This README provides an overview of the project structure and instructions for executing both pipelines.
 
